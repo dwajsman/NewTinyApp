@@ -96,14 +96,20 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("/register", (req, res) => {
+// app.get("/register", (req, res) => {
   
   
-});
+// });
 
 app.post("/register", (req, res) => {
-  res.render("register");
+  let random = generateRandomString();
   
+  users[random] = {
+    id: random, 
+    email: res.param.email, 
+    password: res.param.password
+  };
+
 });
 
 
