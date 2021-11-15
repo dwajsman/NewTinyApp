@@ -1,13 +1,15 @@
 // REQUIRES
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 
+app.use(cookieParser());
+// app.use(bodyParser());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
-
-app.use(bodyParser.urlencoded({extended: true}));
-
+app.use(express.urlencoded({extended: true}));
 
 
 // GLOBAL ITEMS
@@ -39,6 +41,25 @@ function generateRandomString() {
   }
   return random;
 }
+
+
+
+function userByEmail(users, email) {
+  for (const user_id in users) {
+    if (Object.hasOwnProperty.call(users, user_id)) {
+      const user = users[user_id];
+      if (email === user["email"]) {
+        return user_id;
+      };
+    };
+  };
+};
+
+
+// Returns the value of the userId cookie
+const getUserId = (req, res) =>  getAppCookies(req, res)['userId'];
+
+
 
 
 // GET POSTs
@@ -73,8 +94,13 @@ app.get("/fetch", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  let id = req.cookies["user_id"];
+  const templateVars = { urls: urlDatabase, id };
   res.render("urls_index", templateVars);
+
+  // console.log('Cookies: ', req.cookies["user_id"]);
+
+
 });
 
 app.post("/urls", (req, res) => {
@@ -96,20 +122,30 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// app.get("/register", (req, res) => {
+
+
+// REGISTER
+app.get("/register", (req, res) => {
   
-  
-// });
+  res.render("register");
+});
 
 app.post("/register", (req, res) => {
-  let random = generateRandomString();
-  
-  users[random] = {
-    id: random, 
-    email: res.param.email, 
-    password: res.param.password
+  let id = generateRandomString();
+  let email = req.body.email;
+  let password = req.body.password;
+
+  users[id] = {
+    id: id,
+    email: email,
+    password: password,
   };
 
+
+  res.cookie("user_id", id);
+
+  console.log(users);
+  res.redirect("/urls");
 });
 
 
