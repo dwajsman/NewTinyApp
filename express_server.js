@@ -48,6 +48,6 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: /* What goes here? */ };
+  const templateVars = { shortURL: req.params.shortURL, longURL: href="#" };
   res.render("urls_show", templateVars);
 });
