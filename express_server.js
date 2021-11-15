@@ -55,6 +55,21 @@ function userByEmail(users, email) {
   };
 };
 
+function emailByUser(users, user_id) {
+  for (const email in users) {
+    if (Object.hasOwnProperty.call(users, email)) {
+      const email = users[email];
+      if (user_id === user["id"]) {
+        console.log(email);
+        return email;
+      };
+    };
+  };
+};
+
+
+
+
 
 // Returns the value of the userId cookie
 const getUserId = (req, res) =>  getAppCookies(req, res)['userId'];
@@ -94,11 +109,13 @@ app.get("/fetch", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
+
   let id = req.cookies["user_id"];
-  const templateVars = { urls: urlDatabase, id };
+  let email = emailByUser(users, id);
+  const templateVars = { urls: urlDatabase, id, email };
   res.render("urls_index", templateVars);
 
-  // console.log('Cookies: ', req.cookies["user_id"]);
+  console.log('Cookies: ', req.cookies["user_id"]);
 
 
 });
@@ -114,6 +131,8 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  let id = req.cookies["user_id"];
+  const templateVars = { id };
   res.render("urls_new");
 });
 
@@ -141,8 +160,15 @@ app.post("/register", (req, res) => {
     password: password,
   };
 
+  if (!email || !password) {
+    return res.status(400).send("Missing email or password");
+  };
 
   res.cookie("user_id", id);
+  //id = req.cookies["user_id"];
+  // const templateVars = { id };
+  
+
 
   console.log(users);
   res.redirect("/urls");
