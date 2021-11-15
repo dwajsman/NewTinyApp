@@ -48,6 +48,15 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.post("/urls", (req, res) => {
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL;
+  //console.log(longURL);  // Log the POST request body to the console
+  //res.send("Ok");
+  console.log(urlDatabase);
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -58,5 +67,13 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 
-
+function generateRandomString() {
+  let random = "";
+  let pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; //62 long
+  for (let index = 0; index < 6; index++) {
+    const char = pool[Math.floor(Math.random() * 62)];
+    random += char;
+  }
+  return random;
+}
 
