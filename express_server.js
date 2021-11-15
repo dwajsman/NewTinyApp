@@ -42,3 +42,7 @@ app.get("/fetch", (req, res) => {
 });
 
 
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
