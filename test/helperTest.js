@@ -25,4 +25,12 @@ describe('userByEmail', function() {
     assert.equal(expectedUserID, user);
     
   });
+  it('not valid email returns undefined', function() {
+
+    const user = userByEmail(testUsers, "notuser@example.com");
+    const expectedUserID = "userRandomID";
+    // Write your assert statement here
+    assert.notEqual(expectedUserID, user);
+    
+  });
 });
