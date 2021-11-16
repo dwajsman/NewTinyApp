@@ -11,20 +11,20 @@ function generateRandomString() {
 
 function findURLsByUserId(id, urlDatabase) {
   let idUrls = {};
-  console.log("id passed to func", id["id"]);
+  // console.log("id passed to func", id["id"]);
 
   for (const url in urlDatabase) {
     if (Object.hasOwnProperty.call(urlDatabase, url)) {
       const element = urlDatabase[url];
-      console.log('url is', url);
-      console.log(element.userID);
+      // console.log('url is', url);
+      // console.log(element.userID);
 
 
     if (element.userID === id["id"]) {
-      console.log(element);
+      // console.log(element);
       idUrls[url] = element.longURL ;
     }
-    console.log('final arr is', idUrls);
+    // console.log('final arr is', idUrls);
 
 
     }
