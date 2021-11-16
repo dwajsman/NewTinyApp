@@ -182,6 +182,7 @@ app.post("/urls", (req, res) => {
 
   }
     console.log(urlDatabase);
+    res.redirect("/urls");
 });
 
 app.get("/urls/new", (req, res) => {
@@ -206,11 +207,40 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]
-  };
-  res.render("urls_show", templateVars);
+  if (req.cookies.user_id === urlDatabase[req.params.shortURL]["userID"]) {
+
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL]
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    return res.status(400).send("You don't own this URL");
+  }
+
+});
+
+
+app.post("/urls/:shortURL", (req, res) => {
+  if (req.cookies.user_id === urlDatabase[req.params.shortURL]["userID"]) {
+    urlDatabase[req.params.shortURL]["longURL"] = req.body.newUrl;
+  } else {
+    return res.status(400).send("You don't own this URL");
+  }
+  res.redirect('/urls');
+});
+
+
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  if (req.cookies.user_id === urlDatabase[req.params.shortURL]["userID"]) {
+    let key = req.params.shortURL;
+    delete urlDatabase[key];
+  } else {
+    return res.status(400).send("You don't own this URL");
+  }
+
+  res.redirect('/urls');
 });
 
 
