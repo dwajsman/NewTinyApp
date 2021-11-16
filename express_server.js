@@ -2,6 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -32,14 +33,16 @@ const users = {
   "a2kjc3": {
     id: "a2kjc3",
     email: "bill@microsoft.com",
-    password: "vaccinechip"
-  },
+    password: "$2a$10$b3pNdOfR2un6odlr/gPV8OK2gTmydIFCCrlPt4zT1XHIRJszQWy0m"
+  }, 
   "9dds3e": {
     id: "9dds3e",
     email: "steve@apple.com",
-    password: "windowssuks"
+    password: "$2a$10$/l.LDGnP.CpZD7zF6iaoHOIbiAtnnNxaRSeUNmR3gVaDez2CASdX."
   }
 };
+// bill -> jkl
+// steve -> 123
 
 function generateRandomString() {
   let random = "";
@@ -257,6 +260,8 @@ app.post("/register", (req, res) => {
   let id = generateRandomString();
   let email = req.body.email;
   let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  password = hashedPassword;
 
   if (users[userByEmail(users, email)]) {
     return res.status(400).send("Email already used");
@@ -307,7 +312,8 @@ app.post("/login", (req, res) => {
   if (!id) {
     return res.status(403).send("This email cannot be found.");
   }
-  if (email === users[id].email && password === users[id].password) {
+  if (email === users[id].email && bcrypt.compareSync(password, users[id].password)) {
+  // if (email === users[id].email && password === users[id].password) {
     console.log("hello1", email, id);
     res.cookie("user_id", id);
     res.redirect("/urls");
