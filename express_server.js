@@ -19,8 +19,13 @@ app.use(express.urlencoded({
 // GLOBAL ITEMS
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca",
+              userID: "a2kjc3",
+            },
+  "9sm5xK": {longURL: "http://www.google.com",
+              userID: "9dds3e",
+            }
+            
 };
 
 const users = {
@@ -45,6 +50,35 @@ function generateRandomString() {
   }
   return random;
 }
+
+
+function findURLsByUserId(id) {
+  let idUrls = {};
+  console.log("id passed to func", id["id"]);
+
+  for (const url in urlDatabase) {
+    if (Object.hasOwnProperty.call(urlDatabase, url)) {
+      const element = urlDatabase[url];
+      console.log('url is', url);
+      console.log(element.userID);
+
+
+    if (element.userID === id["id"]) {
+      console.log(element);
+      idUrls[url] = element.longURL ;
+    }
+    console.log('final arr is', idUrls);
+
+
+    }
+  }
+
+
+
+  return idUrls;
+
+}
+
 
 
 
@@ -76,6 +110,19 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+
+app.get("/u/:shortURL", (req, res) => {
+  let key = req.params.shortURL;
+  let longURL = urlDatabase[key]["longURL"];
+  if (!urlDatabase[key]) {
+    return res.redirect('/');
+  }
+  res.redirect(longURL);
+
+});
+
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
@@ -105,9 +152,13 @@ app.get("/urls", (req, res) => {
 
   let id = req.cookies["user_id"];
   if (users[id]) {
+
+    let usrUrls = findURLsByUserId(users[id]);
+
+
     let email = users[id].email;
     const templateVars = {
-      urls: urlDatabase,
+      urls: usrUrls,
       user: users[id],
     };
     res.render("urls_index", templateVars);
@@ -122,24 +173,32 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let longURL = req.body.longURL;
-  let shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
-  //console.log(longURL);  // Log the POST request body to the console
-  //res.send("Ok");
-   
-  console.log(urlDatabase);
+  if (req.cookies.user_id) {
+    let longURL = req.body.longURL;
+    let shortURL = generateRandomString();
+    urlDatabase[shortURL] = {"longURL": longURL,
+              "userID": req.cookies.user_id,
+            };
+
+  }
+    console.log(urlDatabase);
 });
 
 app.get("/urls/new", (req, res) => {
+  if (req.cookies.user_id) {
+    const templateVars = {
+      user: req.cookies.user_id,
+    };
+    res.render("urls_new");
+  } else {
+    res.redirect("/login");
+  }
+
   // let id = req.cookies["user_id"];
   // const templateVars = {
   //   id
   // };
-  const templateVars = {
-    user: req.cookies.user_id,
-  };
-  res.render("urls_new");
+
 });
 
 
@@ -240,7 +299,6 @@ app.post("/logout", (req, res) => {
   const { user_id } = req.body;
 
   res.clearCookie('user_id', user_id);
-
 
   res.redirect('/login');
 });
