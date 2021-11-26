@@ -166,7 +166,10 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
 
-  // test to see if user owns shortURL goes here?
+  if (!req.session.user_id) {
+    return res.status(403).send("You are not logged in");
+  }
+
   if (req.session.user_id === urlDatabase[req.params.shortURL]["userID"]) {
     const templateVars = {
       shortURL: req.params.shortURL,
