@@ -77,7 +77,7 @@ app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[key]) {
     return res.redirect('/');
   }
-  res.redirect(longURL);
+  return res.redirect(`http://${longURL}`);
 
 });
 
@@ -267,10 +267,16 @@ app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
-  if (!email || !password) {
-    return res.status(400).send("Missing email or password");
+  if (email === '' && password === '') {
+    return res.status(400).send('Please enter Email and Password');
   }
-   
+  if (email === '') {
+    return res.status(400).send('Please enter Email');
+  }
+  if (password === '') {
+    return res.status(400).send('Please enter Password');
+  }
+  
   let id = userByEmail(users, email);
   
   if (!id) {
